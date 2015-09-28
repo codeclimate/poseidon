@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'poseidon/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = "poseidon"
+  gem.name          = "codeclimate-poseidon"
   gem.version       = Poseidon::VERSION
   gem.authors       = ["Bob Potter"]
   gem.email         = ["bobby.potter@gmail.com"]
