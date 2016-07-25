@@ -57,6 +57,7 @@ module Poseidon
         if !messages_to_send.pending_messages? || @max_send_retries == 0
           break
         else
+          Poseidon.logger.debug { "retrying sending #{messages_to_send.messages} messages"  }
           Kernel.sleep retry_backoff_ms / 1000.0
           reset_metadata
           ensure_metadata_available_for_topics(messages_to_send)
@@ -100,14 +101,14 @@ module Poseidon
       @socket_timeout_ms = handle_option(options, :socket_timeout_ms)
       @retry_backoff_ms  = handle_option(options, :retry_backoff_ms)
 
-      @metadata_refresh_interval_ms = 
+      @metadata_refresh_interval_ms =
         handle_option(options, :metadata_refresh_interval_ms)
 
       @required_acks    = handle_option(options, :required_acks)
       @max_send_retries = handle_option(options, :max_send_retries)
 
       @compression_config = ProducerCompressionConfig.new(
-        handle_option(options, :compression_codec), 
+        handle_option(options, :compression_codec),
         handle_option(options, :compressed_topics))
 
       @partitioner = handle_option(options, :partitioner)
@@ -155,6 +156,7 @@ module Poseidon
         messages_for_broker.successfully_sent(response)
       end
     rescue Connection::ConnectionFailedError
+      Poseidon.logger.warn { "Failed to send messages to #{messages_for_broker.broker_id} due to connection failure"  }
       false
     end
   end
