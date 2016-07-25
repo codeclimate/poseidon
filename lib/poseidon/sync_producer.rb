@@ -57,6 +57,7 @@ module Poseidon
         if !messages_to_send.pending_messages? || @max_send_retries == 0
           break
         else
+          Poseidon.logger.debug { "retrying sending #{messages_to_send.messages} messages"  }
           Kernel.sleep retry_backoff_ms / 1000.0
           reset_metadata
           ensure_metadata_available_for_topics(messages_to_send)
@@ -155,6 +156,7 @@ module Poseidon
         messages_for_broker.successfully_sent(response)
       end
     rescue Connection::ConnectionFailedError
+      Poseidon.logger.debug { "Failed to send messages to #{messages_for_broker.broker_id} due to connection failure"  }
       false
     end
   end
