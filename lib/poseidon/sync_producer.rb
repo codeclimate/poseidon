@@ -100,14 +100,14 @@ module Poseidon
       @socket_timeout_ms = handle_option(options, :socket_timeout_ms)
       @retry_backoff_ms  = handle_option(options, :retry_backoff_ms)
 
-      @metadata_refresh_interval_ms = 
+      @metadata_refresh_interval_ms =
         handle_option(options, :metadata_refresh_interval_ms)
 
       @required_acks    = handle_option(options, :required_acks)
       @max_send_retries = handle_option(options, :max_send_retries)
 
       @compression_config = ProducerCompressionConfig.new(
-        handle_option(options, :compression_codec), 
+        handle_option(options, :compression_codec),
         handle_option(options, :compressed_topics))
 
       @partitioner = handle_option(options, :partitioner)
