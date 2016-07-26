@@ -163,7 +163,7 @@ module Poseidon
     end
 
     def raise_connection_failed_from_exception(ex)
-      raise_connection_failed_error("Inital exception class=#{ex.class} message=#{ex.message}")
+      raise_connection_failed_error("Initial exception class=#{ex.class} message=#{ex.message}")
     end
 
     def raise_connection_failed_error(message)
