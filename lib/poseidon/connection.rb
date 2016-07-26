@@ -104,7 +104,7 @@ module Poseidon
         begin
           @socket = TCPSocket.new(@host, @port)
         rescue SystemCallError => ex
-          raise_connection_failed_error(ex)
+          raise_connection_failed_from_exception(ex)
         end
       end
     end
@@ -112,7 +112,7 @@ module Poseidon
     def read_response(response_class)
       r = ensure_read_or_timeout(4)
       if r.nil?
-        raise_connection_failed_error
+        raise_connection_failed_error("Could not read from socket")
       end
       n = r.unpack("N").first
       s = ensure_read_or_timeout(n)
@@ -120,7 +120,7 @@ module Poseidon
       response_class.read(buffer)
     rescue Errno::ECONNRESET, SocketError, TimeoutException => ex
       @socket = nil
-      raise_connection_failed_error(ex)
+      raise_connection_failed_from_exception(ex)
     end
 
     def ensure_read_or_timeout(maxlen)
@@ -137,7 +137,7 @@ module Poseidon
       ensure_write_or_timeout([buffer.to_s.bytesize].pack("N") + buffer.to_s)
     rescue Errno::EPIPE, Errno::ECONNRESET, TimeoutException => ex
       @socket = nil
-      raise_connection_failed_error(ex)
+      raise_connection_failed_from_exception(ex)
     end
 
     def ensure_write_or_timeout(data)
@@ -162,14 +162,12 @@ module Poseidon
       @correlation_id  += 1
     end
 
-    def raise_connection_failed_error(ex = nil)
-      message =
-        if ex
-          "Failed to connect to #{@host}:#{@port}. Inital exception class=#{ex.class} message=#{ex.message}"
-        else
-          "Failed to connect to #{@host}:#{@port}."
-        end
-      raise ConnectionFailedError,  message
+    def raise_connection_failed_from_exception(ex)
+      raise_connection_failed_error("Inital exception class=#{ex.class} message=#{ex.message}")
+    end
+
+    def raise_connection_failed_error(message)
+      raise ConnectionFailedError, "Failed to connect to #{@host}:#{@port}. #{message}"
     end
   end
 end
