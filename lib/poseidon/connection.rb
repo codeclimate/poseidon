@@ -51,7 +51,7 @@ module Poseidon
       req = ProduceRequest.new( request_common(:produce),
                                 required_acks,
                                 timeout,
-                                messages_for_topics) 
+                                messages_for_topics)
       send_request(req)
       if required_acks != 0
         read_response(ProduceResponse)
@@ -71,7 +71,7 @@ module Poseidon
                                 REPLICA_ID,
                                 max_wait_time,
                                 min_bytes,
-                                topic_fetches) 
+                                topic_fetches)
       send_request(req)
       read_response(FetchResponse)
     end
