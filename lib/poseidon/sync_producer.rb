@@ -155,8 +155,8 @@ module Poseidon
       else
         messages_for_broker.successfully_sent(response)
       end
-    rescue Connection::ConnectionFailedError
-      Poseidon.logger.warn { "Failed to send messages to #{messages_for_broker.broker_id} due to connection failure"  }
+    rescue Connection::ConnectionFailedError => ex
+      Poseidon.logger.warn { "Failed to send messages to #{messages_for_broker.broker_id} due to connection failure: message=#{ex.message}" }
       false
     end
   end
