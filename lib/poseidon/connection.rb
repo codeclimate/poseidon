@@ -51,7 +51,7 @@ module Poseidon
       req = ProduceRequest.new( request_common(:produce),
                                 required_acks,
                                 timeout,
-                                messages_for_topics) 
+                                messages_for_topics)
       send_request(req)
       if required_acks != 0
         read_response(ProduceResponse)
@@ -71,7 +71,7 @@ module Poseidon
                                 REPLICA_ID,
                                 max_wait_time,
                                 min_bytes,
-                                topic_fetches) 
+                                topic_fetches)
       send_request(req)
       read_response(FetchResponse)
     end
@@ -103,8 +103,8 @@ module Poseidon
       if @socket.nil? || @socket.closed?
         begin
           @socket = TCPSocket.new(@host, @port)
-        rescue SystemCallError
-          raise_connection_failed_error
+        rescue SystemCallError => ex
+          raise_connection_failed_from_exception(ex)
         end
       end
     end
@@ -112,15 +112,15 @@ module Poseidon
     def read_response(response_class)
       r = ensure_read_or_timeout(4)
       if r.nil?
-        raise_connection_failed_error
+        raise_connection_failed_error("Could not read from socket")
       end
       n = r.unpack("N").first
       s = ensure_read_or_timeout(n)
       buffer = Protocol::ResponseBuffer.new(s)
       response_class.read(buffer)
-    rescue Errno::ECONNRESET, SocketError, TimeoutException
+    rescue Errno::ECONNRESET, SocketError, TimeoutException => ex
       @socket = nil
-      raise_connection_failed_error
+      raise_connection_failed_from_exception(ex)
     end
 
     def ensure_read_or_timeout(maxlen)
@@ -135,9 +135,9 @@ module Poseidon
       buffer = Protocol::RequestBuffer.new
       request.write(buffer)
       ensure_write_or_timeout([buffer.to_s.bytesize].pack("N") + buffer.to_s)
-    rescue Errno::EPIPE, Errno::ECONNRESET, TimeoutException
+    rescue Errno::EPIPE, Errno::ECONNRESET, TimeoutException => ex
       @socket = nil
-      raise_connection_failed_error
+      raise_connection_failed_from_exception(ex)
     end
 
     def ensure_write_or_timeout(data)
@@ -162,8 +162,12 @@ module Poseidon
       @correlation_id  += 1
     end
 
-    def raise_connection_failed_error
-      raise ConnectionFailedError, "Failed to connect to #{@host}:#{@port}"
+    def raise_connection_failed_from_exception(ex)
+      raise_connection_failed_error("Initial exception class=#{ex.class} message=#{ex.message}")
+    end
+
+    def raise_connection_failed_error(message)
+      raise ConnectionFailedError, "Failed to connect to #{@host}:#{@port}. #{message}"
     end
   end
 end
