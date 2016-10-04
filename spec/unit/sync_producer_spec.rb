@@ -95,7 +95,7 @@ RSpec.describe SyncProducer do
       it "raises an exception" do
         expect {
           @sp.send_messages([Message.new(:topic => "topic", :value => "value")])
-        }.to raise_error
+        }.to raise_error(Poseidon::Errors::MessageDeliveryError)
       end
     end
 
