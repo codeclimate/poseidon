@@ -49,6 +49,6 @@ RSpec.describe "objects with errors" do
                                                   [partition_fetch_response])
     response = FetchResponse.new(double('common'), [topic_fetch_response])
 
-    expect { response.raise_error_if_one_exists }.to raise_error
+    expect { response.raise_error_if_one_exists }.to raise_error(Poseidon::Errors::LeaderNotAvailable)
   end
 end

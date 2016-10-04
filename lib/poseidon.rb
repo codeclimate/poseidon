@@ -62,6 +62,9 @@ module Poseidon
       10 => MessageSizeTooLarge
     }
 
+    # Raised when messages were not successfully produced to Kafka
+    class MessageDeliveryError < StandardError; end
+
     # Raised when a custom partitioner tries to send
     # a message to a partition that doesn't exist.
     class InvalidPartitionError < StandardError; end

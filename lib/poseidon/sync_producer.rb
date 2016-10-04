@@ -65,7 +65,7 @@ module Poseidon
       end
 
       if messages_to_send.pending_messages?
-        raise "Failed to send all messages: #{messages_to_send.messages} remaining"
+        raise Errors::MessageDeliveryError, "Failed to send all messages: #{messages_to_send.messages} remaining"
       else
         true
       end

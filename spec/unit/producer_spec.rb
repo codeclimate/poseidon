@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Producer do
   it "requires brokers and client_id" do
-    expect { Producer.new }.to raise_error
+    expect { Producer.new }.to raise_error(ArgumentError)
   end
 
   it "raises ArgumentError on unknown arguments" do
