@@ -1,7 +1,7 @@
 FROM ruby:2.3.1-alpine
 MAINTAINER Code Climate <hello@codeclimate.com>
 
-RUN apk --update add git build-base autoconf automake libtool ruby-dev ruby-bundler snappy openjdk8 && \
+RUN apk --update add curl git build-base autoconf automake libtool ruby-dev ruby-bundler snappy openjdk8 && \
   rm -fr /usr/share/ri
 
 ENV KAFKA_SRC=http://apache.cs.utah.edu/kafka/0.8.2.1/kafka_2.10-0.8.2.1.tgz
