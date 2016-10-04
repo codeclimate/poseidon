@@ -11,6 +11,14 @@ module Poseidon
     API_VERSION = 0
     REPLICA_ID = -1 # Replica id is always -1 for non-brokers
 
+    REQUEST_CONNECTION_ERRORS = [
+      Errno::ECONNRESET,
+      Errno::EHOSTUNREACH,
+      Errno::EPIPE,
+      Errno::ETIMEDOUT,
+      TimeoutException,
+    ].freeze
+
     # @yieldparam [Connection]
     def self.open(host, port, client_id, socket_timeout_ms, &block)
       connection = new(host, port, client_id, socket_timeout_ms)
@@ -135,7 +143,7 @@ module Poseidon
       buffer = Protocol::RequestBuffer.new
       request.write(buffer)
       ensure_write_or_timeout([buffer.to_s.bytesize].pack("N") + buffer.to_s)
-    rescue Errno::EPIPE, Errno::ECONNRESET, Errno::ETIMEDOUT, TimeoutException => ex
+    rescue *REQUEST_CONNECTION_ERRORS => ex
       @socket = nil
       raise_connection_failed_from_exception(ex)
     end
