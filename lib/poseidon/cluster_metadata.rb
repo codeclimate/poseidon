@@ -49,6 +49,8 @@ module Poseidon
 
     # Return lead broker for topic and partition
     def lead_broker_for_partition(topic_name, partition)
+      raise ::Poseidon::Errors::UnknownTopicOrPartition unless @topic_metadata[topic_name]
+
       broker_id = @topic_metadata[topic_name].partition_leader(partition)
       if broker_id
         @brokers[broker_id]

@@ -42,5 +42,11 @@ RSpec.describe ClusterMetadata do
       expect(@cm.lead_broker_for_partition("test",1).id).to eq(1)
       expect(@cm.lead_broker_for_partition("test",2).id).to eq(2)
     end
+
+    it "raises an UnknownErrorOrPartition when the topic does not exist" do
+      expect {
+        @cm.lead_broker_for_partition("nonsense",1)
+      }.to raise_error(::Poseidon::Errors::UnknownTopicOrPartition)
+    end
   end
 end
