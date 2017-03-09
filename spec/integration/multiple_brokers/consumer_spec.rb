@@ -23,6 +23,21 @@ RSpec.describe "consuming with multiple brokers", :type => :request do
     expect(brokers.size).to eq(3)
   end
 
+  it "raises a helpful error when there's no matching broker to be found" do
+    pc = PartitionConsumer.consumer_for_partition("test_client",
+                                                  ["localhost:9092"],
+                                                  "test", 0,
+                                                  :earliest_offset)
+    expect(pc).to be_a PartitionConsumer
+
+    expect {
+      PartitionConsumer.consumer_for_partition("test_client",
+                                               ["localhost:9092"],
+                                               "test", 42,
+                                               :earliest_offset)
+    }.to raise_error(::Poseidon::Errors::UnknownTopicOrPartition)
+  end
+
   it "consumes from all partitions" do
     @p = Producer.new(["localhost:9092","localhost:9093","localhost:9094"], "test",
                      :required_acks => 1)

@@ -55,7 +55,7 @@ module Poseidon
       if broker_id
         @brokers[broker_id]
       else
-        nil
+        raise ::Poseidon::Errors::UnknownTopicOrPartition
       end
     end
 
