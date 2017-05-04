@@ -49,14 +49,22 @@ module Poseidon
 
     # Return lead broker for topic and partition
     def lead_broker_for_partition(topic_name, partition)
-      raise ::Poseidon::Errors::UnknownTopicOrPartition unless @topic_metadata[topic_name]
-
-      broker_id = @topic_metadata[topic_name].partition_leader(partition)
-      if broker_id
-        @brokers[broker_id]
-      else
-        raise ::Poseidon::Errors::UnknownTopicOrPartition
+      unless @topic_metadata[topic_name]
+        raise ::Poseidon::Errors::UnknownTopicOrPartition,
+          "Topic not found: #{topic_name}"
       end
+
+      unless (broker_id = @topic_metadata[topic_name].partition_leader(partition))
+        raise ::Poseidon::Errors::UnknownTopicOrPartition,
+          "Partition not found #{topic_name}/#{partition}"
+      end
+
+      unless (broker = @brokers[broker_id])
+        raise ::Poseidon::Errors::LeaderNotAvailable,
+          "Lead broker #{broker_id} not present in brokers: #{@brokers.keys.inspect}"
+      end
+
+      broker
     end
 
     def topics
